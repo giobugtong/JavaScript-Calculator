@@ -19,7 +19,7 @@ h3{
 }
 #main-container{
     display: block;
-    margin: auto;
+    margin: auto auto 1rem auto;
     height: 700px;
     width: 350px;
     background: rgb(0, 0, 0);
