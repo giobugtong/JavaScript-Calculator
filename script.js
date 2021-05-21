@@ -1,8 +1,4 @@
 //JavaScript Calculator
-//--------------------------------
-
-// add commas
-// figure out how to make text fit screen when using changeSign() without decreasing displayScreen font size
 
 class Calculator {
     constructor(displayScreen) {
@@ -24,7 +20,6 @@ class Calculator {
         } else if (number === "." && !this.currentOperand.toString().includes(".") && this.currentOperand === "") {
             this.currentOperand = "0"; // allows user to enter a decimal while retaining the zero "0" before the decimal point
         } else if (number !== "0" && number !== "." && this.currentOperand === "0") {
-            console.log("gotcha")
             document.querySelector("#allClear").innerHTML = "C";
             return this.currentOperand = number.toString(); 
         } else if (number === "." && this.currentOperand === "0") {
@@ -58,8 +53,7 @@ class Calculator {
         let current = Number(this.currentOperand);
         let firstOperand;
         if (isNaN(previous) || isNaN(current)) return
-        if (this.operation != undefined && this.previousOperand === "") {
-            console.log("continuous");
+        if (this.operation != undefined && this.previousOperand === "") { //computes continuously with the most recent operation as you keep pressing equals button
             this.previousOperand = current;
             switch (this.operation) {
                 case "+": {
@@ -90,8 +84,12 @@ class Calculator {
                     return
             }
             result = this.roundOff(result);
-            result = Number(result);
-            this.currentOperand = Number(result);
+            if (result.toString().includes("e")) {
+                this.currentOperand = result;
+            } else {
+                result = Number(result);
+                this.currentOperand = Number(result);
+            }
         } else
         switch (this.operation) {
             case "+": {
@@ -119,78 +117,56 @@ class Calculator {
                 return
         }
         result = this.roundOff(result);
-        result = Number(result);
+        if (result.toString().includes("e")) {
+            this.currentOperand = result;
+        } else {
+            result = Number(result);
+            this.currentOperand = Number(result);
+        }
         this.secondOperand = this.previousOperand;
-        this.currentOperand = Number(result);
         this.previousOperand = "";
     }
 
     formatDigits(number) {
-        this.number = number;
-        console.log(Number(number.toLocaleString('en')))
+        const stringNumber = number.toString();
+        const integerDigits = parseFloat(stringNumber.split(".")[0]);
+        const decimalDigits = stringNumber.split(".")[1];
+        let integerDisplay;
+        if (number === "pls don't") {
+            integerDisplay = "pls don't"
+        } else {
+            integerDisplay = integerDigits.toLocaleString("en", { maximumFractionDigits: 0 })
+        }
+        if (decimalDigits != null) {
+            return `${integerDisplay}.${decimalDigits}`
+        } else {
+            return integerDisplay;
+        }
     }
 
     updateDisplay() {
-        if (this.currentOperand.toString().includes(".") && this.currentOperand.length < 2) {
+        if (this.currentOperand.toString().includes("-")) {
+            if (this.currentOperand.toString().includes(".")) {
+                this.currentOperand = this.currentOperand.toString().substring(0,11);
+            } else if (this.currentOperand.length > 10) {
+                this.currentOperand = this.currentOperand.toString().substring(0,11);
+            }
+        } else if (this.currentOperand.toString().includes(".")) {
             this.currentOperand = this.currentOperand.toString().substring(0,10);
-        } else if (this.currentOperand.toString().includes(".") && this.currentOperand.length > 2) {
-            this.currentOperand = this.currentOperand.toString().substring(0,10);
-            // this.currentOperand = Number(this.currentOperand); check back on this later
         } else if (this.currentOperand.length > 9) {
             this.currentOperand = this.currentOperand.toString().substring(0,9);
-        // } else if (this.currentOperand === "0") {
-        //     return this.currentOperand = "";
-        } 
-        this.displayScreen.innerHTML = this.currentOperand;
+        }
+        this.displayScreen.innerHTML = this.formatDigits(this.currentOperand);
     }
-    
-    // fitText(){
-    //     // max font size in pixels
-    //     const maxFontSize = 56;
-    //     // get the DOM output element by its selector
-    //     let outputDiv = document.querySelector("#display");
-    //     // get element's width
-    //     let width = outputDiv.clientWidth;
-    //     // get content's width
-    //     let contentWidth = outputDiv.scrollWidth;
-    //     // get fontSize
-    //     let fontSize = parseInt(window.getComputedStyle(outputDiv, null).getPropertyValue('font-size'),10);
-    //     // if content's width is bigger then elements width - overflow
-    //     if (contentWidth > width){
-    //         fontSize = Math.ceil(fontSize * width/contentWidth,10);
-    //         fontSize =  fontSize > maxFontSize  ? fontSize = maxFontSize  : fontSize - 1;
-    //         outputDiv.style.fontSize = fontSize+'px';   
-    //     } else {
-    //         // content is smaller then width... let's resize in 1 px until it fits 
-    //         while (contentWidth === width && fontSize < maxFontSize){
-    //             fontSize = Math.ceil(fontSize) + 1;
-    //             fontSize = fontSize > maxFontSize  ? fontSize = maxFontSize  : fontSize;
-    //             outputDiv.style.fontSize = fontSize+'px';   
-    //             // update widths
-    //             width = outputDiv.clientWidth;
-    //             contentWidth = outputDiv.scrollWidth;
-    //             if (contentWidth > width){
-    //                 outputDiv.style.fontSize = fontSize-1+'px'; 
-    //             }
-    //         }
-    //     }
-    // }
 
     changeSign(number) {
         this.number = number;
         let result
         if (number === "0" || number === "") {
-            console.log("changeSign")
             return this.currentOperand = "-0";
         } else if (number === "-0") return this.currentOperand = "0"
         result = Number(number) * -1;
         this.currentOperand = result.toString();
-        if (this.operation != undefined && this.previousOperand === "") {
-            // this.secondOperand = this.previousOperand;
-            // this.currentOperand = Number(result);
-            // this.previousOperand = "";
-            //figure this part out, continuous computation is not working correctly when changeSign is used.
-        }
     }
     
     toPercent(number) {
@@ -225,7 +201,7 @@ const displayScreen = document.querySelector("#display");
 
 const calculator = new Calculator(displayScreen);
 
-numberButtons.forEach(button => {
+numberButtons.forEach(button => { 
     button.addEventListener("click", () => {
         calculator.appendNumber(button.innerHTML);
         calculator.updateDisplay();
@@ -236,7 +212,7 @@ operationButtons.forEach(button => {
     button.addEventListener("click", () => {
         if (calculator.currentOperand === "" || calculator.currentOperand === "pls don't") return
         calculator.chooseOperation(button.innerHTML);
-        displayScreen.innerHTML = calculator.previousOperand;
+        displayScreen.innerHTML = calculator.formatDigits(calculator.previousOperand);
     })
 });
 
