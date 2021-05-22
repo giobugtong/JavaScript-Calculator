@@ -24,7 +24,7 @@ class Calculator {
             return this.currentOperand = number.toString(); 
         } else if (number === "." && this.currentOperand === "0") {
             return this.currentOperand = "0" + number.toString();
-        } else if (this.currentOperand === "-0") {
+        } else if (this.currentOperand === "-0" && number !== ".") {
             document.querySelector("#allClear").innerHTML = "C";
             return this.currentOperand = "-" + number.toString();
         } else if (number === "0" && this.currentOperand === "" || number === "0" && this.currentOperand === "0") {
