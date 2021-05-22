@@ -57,7 +57,7 @@ class Calculator {
             this.previousOperand = current;
             switch (this.operation) {
                 case "+": {
-                    firstOperand = Number(current - Number(this.secondOperand));
+                    firstOperand = Math.abs(current - Number(this.secondOperand));
                     result = current + firstOperand;
                     break;
                 }
@@ -167,6 +167,7 @@ class Calculator {
         } else if (number === "-0") return this.currentOperand = "0"
         result = Number(number) * -1;
         this.currentOperand = result.toString();
+        this.secondOperand = this.secondOperand * -1;
     }
     
     toPercent(number) {
